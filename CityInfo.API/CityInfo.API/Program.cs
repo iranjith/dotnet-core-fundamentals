@@ -9,7 +9,8 @@ builder.Services.AddControllers(options =>
 
         options.ReturnHttpNotAcceptable = true;
     }
-).AddXmlDataContractSerializerFormatters(); //add support for XML output format
+).AddNewtonsoftJson()
+ .AddXmlDataContractSerializerFormatters(); //add support for XML output format
 
 //builder.Services.AddProblemDetails(options =>
 //{

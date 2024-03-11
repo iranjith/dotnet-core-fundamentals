@@ -34,5 +34,28 @@ namespace CityInfo.API.Controllers
             return File(bytes, contentType, Path.GetFileName(filePath));
 
         }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateFile(IFormFile file)
+        {
+            if(file.Length ==0  || file.Length>20971520 || file.ContentType!="application/pdf")
+            {
+                return BadRequest("No valid input file.");
+
+            }
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), $"uploaded_file_{Guid.NewGuid()}.pdf");
+
+            using (var stream=new FileStream(path,FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok("File uploaded.")
+             
+
+
+
+        }
     }
 }
