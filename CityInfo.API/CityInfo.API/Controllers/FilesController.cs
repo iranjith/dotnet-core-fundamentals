@@ -51,7 +51,7 @@ namespace CityInfo.API.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            return Ok("File uploaded.")
+            return Ok("File uploaded.");
              
 
 
