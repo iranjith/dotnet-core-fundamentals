@@ -1,6 +1,8 @@
 using CityInfo.API;
+using CityInfo.API.DbContexts;
 using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
@@ -42,6 +44,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
+
 #if DEBUG
     builder.Services.AddTransient<IMailService, LocalMailServices>();
 #else
@@ -49,6 +52,11 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 #endif
 
 builder.Services.AddSingleton<CitiesDataStore>();
+builder.Services.AddDbContext<CityInfoContext>(dbContext =>
+{
+    dbContext.UseSqlite("Data Source=CityInfo.db");
+});
+
 
 var app = builder.Build();
 
