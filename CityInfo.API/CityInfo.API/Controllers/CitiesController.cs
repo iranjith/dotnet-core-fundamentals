@@ -1,4 +1,6 @@
-﻿using CityInfo.API.Models;
+﻿using AutoMapper;
+using CityInfo.API.Models;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
@@ -7,28 +9,47 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class CitiesController : ControllerBase
     {
-        private readonly CitiesDataStore _citiesDataStore;
+        private readonly ICityInfoRepository _cityInfoRepository;
+        private readonly IMapper _mapper;
 
-        public CitiesController(CitiesDataStore citiesDataStore)
+        public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
         {
-            _citiesDataStore = citiesDataStore;
+            _cityInfoRepository= cityInfoRepository ?? throw new Exception(nameof(cityInfoRepository));
+            _mapper = mapper ?? throw new Exception(nameof(IMapper));
         }
 
+
         [HttpGet]
-        public ActionResult<List<CityDto>> GetCities()
+        public async Task<ActionResult<List<CityDto>>> GetCities()
         {
-            return Ok(_citiesDataStore.Cities);
+
+            var cityEntites = await _cityInfoRepository.GetCitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<CityWithOutPointOfInterestDto>>(cityEntites));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CityDto> GetCity(int id)
+        public async Task<IActionResult> GetCity(int id, bool includePointOfInterest=false)
         {
-            var cityToReturn = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == id);
-            if(cityToReturn==null)
+
+            var city = await _cityInfoRepository.GetCityAsync(id,includePointOfInterest);
+
+            if (city == null)
             {
                 return NotFound();
             }
-            return Ok(cityToReturn);
+            if (includePointOfInterest)
+            {
+                return Ok(_mapper.Map<CityDto>(city));
+            }
+
+            return Ok(_mapper.Map<CityWithOutPointOfInterestDto>(city));
+
+            //var cityToReturn = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == id);
+            //if(cityToReturn==null)
+            //{
+            //    return NotFound();
+            //}
+            //return Ok(cityToReturn);
         }
 
 
