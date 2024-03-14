@@ -20,10 +20,10 @@ namespace CityInfo.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<CityDto>>> GetCities()
+        public async Task<ActionResult<List<CityWithOutPointOfInterestDto>>> GetCities(string? name, string? searchQuery)
         {
 
-            var cityEntites = await _cityInfoRepository.GetCitiesAsync();
+            var cityEntites = await _cityInfoRepository.GetCitiesAsync(name, searchQuery);
             return Ok(_mapper.Map<IEnumerable<CityWithOutPointOfInterestDto>>(cityEntites));
         }
 

@@ -6,6 +6,8 @@ namespace CityInfo.API.Services
     {
         Task<IEnumerable<City>> GetCitiesAsync();
 
+        Task<IEnumerable<City>> GetCitiesAsync(string? name, string? searchQuery);
+
         Task<City?> GetCityAsync(int cityId, bool includePointOfInterest);
 
         Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);
@@ -19,5 +21,7 @@ namespace CityInfo.API.Services
         void DeletePointOfInterest(PointOfInterest pointOfInterest);
 
         Task<bool> SaveChangesAsync();
+
+
     }
 }
