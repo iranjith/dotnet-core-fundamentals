@@ -11,12 +11,12 @@ namespace CityInfo.API.Services
             _cityInfoContext = cityInfoContext ?? throw new ArgumentNullException(nameof(cityInfoContext));
         }
 
-        async Task<IEnumerable<City>> ICityInfoRepository.GetCitiesAsync()
+        public async Task<IEnumerable<City>> GetCitiesAsync()
         {
             return await _cityInfoContext.Cities.OrderBy(c=>c.Name).ToListAsync();
         }
 
-        async Task<City?> ICityInfoRepository.GetCityAsync(int cityId, bool includePointOfInterest)
+        public async Task<City?> GetCityAsync(int cityId, bool includePointOfInterest)
         {
             if (includePointOfInterest)
             {
@@ -26,20 +26,40 @@ namespace CityInfo.API.Services
 
         }
 
-        async Task<IEnumerable<PointOfInterest>> ICityInfoRepository.GetPointsOfInterestForCityAsync(int cityId)
+        public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId)
         {
             return await _cityInfoContext.PointOfInterests.ToListAsync();
         }
          
-        async Task<PointOfInterest?> ICityInfoRepository.GetPointOfInterestForCityAsync(int cityId, int pointOfInterestId)
+        public async Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterestId)
         {
             return await _cityInfoContext.PointOfInterests.Where(p => p.CityId == cityId && p.Id == pointOfInterestId).FirstOrDefaultAsync();
 
         }
 
-        async Task<bool> ICityInfoRepository.CityExistsAsync(int cityId)
+        public async Task<bool> CityExistsAsync(int cityId)
         {
             return await _cityInfoContext.Cities.AnyAsync(c => c.Id == cityId);
+        }
+
+        public async Task AddPointOfInterestForCityAsync(int cityId, PointOfInterest pointOfInterest)
+        {
+            var city = await GetCityAsync(cityId,false);
+            if (city != null)
+            {
+                city.PointOfInterests.Add(pointOfInterest);
+            }
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return (await _cityInfoContext.SaveChangesAsync()>=0);
+
+        }
+
+        public void DeletePointOfInterest(PointOfInterest pointOfInterest)
+        {
+            _cityInfoContext.PointOfInterests.Remove(pointOfInterest);
         }
     }
 }
